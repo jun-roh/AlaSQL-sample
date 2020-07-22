@@ -1,0 +1,52 @@
+<script src="js/jquery-3.5.1.min.js"></script>
+<script src="js/alasql.js"></script>
+<script src="js/xlsx.min.js"></script>
+<script>
+    // Example 1 - SQL Table
+    /* create SQL Table and add data */
+    alasql("CREATE TABLE cities (city string, pop number)");
+
+    /* Insert Data*/
+    alasql("INSERT INTO cities VALUES ('Paris',2249975),('Berlin',3517424),('Madrid',3041579)");
+
+    /* execute query */
+    var res1 = alasql("SELECT * FROM cities WHERE pop < 3500000 ORDER BY pop DESC");
+    console.log("res1 Result : ")
+    console.log(res1)
+
+    // Example 2 - Array Object
+    var data = [ {a: 1, b: 10}, {a: 2, b: 20}, {a: 1, b: 30} ];
+    var res2 = alasql('SELECT a, SUM(b) AS b FROM ? GROUP BY a',[data]);
+    console.log("res2 Result : ")
+    console.log(res2)
+
+    // Example 3 - Using Excel File
+    alasql(['SELECT * FROM XLS("data/mydata") WHERE city = "London" '])
+        .then(function(res){
+            console.log("res3 Result : ")
+            console.log(res);
+        }).catch(function(err){
+            console.log('Does the file exist? There was an error:', err);
+        });
+
+    // Example 4 - Bulk Data Load
+    alasql("CREATE TABLE example4 (a INT, b INT)");
+    // alasql's data store for a table can be assigned directly
+    alasql.tables.example4.data = [ {a:2,b:6}, {a:3,b:4} ];
+    // ... or manipulated with normal SQL
+    alasql("INSERT INTO example4 VALUES (1,5)");
+    var res4 = alasql("SELECT * FROM example4 ORDER BY b DESC");
+    console.log("res4 Result : ")
+    console.log(res4)
+
+
+    // Example 5 - Precompile Statements
+    var data = [{a:1},{a:2},{a:3},{a:4},{a:5}];
+    // Compile
+    var mysum = alasql.compile("SELECT VALUE SUM(a) FROM ? WHERE a > 2");
+    // Run
+    var res5 = mysum([data])
+    console.log("res5 Result : ")
+    console.log(res5)
+
+</script>
